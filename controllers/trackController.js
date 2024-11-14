@@ -26,6 +26,9 @@ const getTrackById = async (req, res) => {
 
 const createTrack = async (req, res) => {
     try {
+        if (req.user.role != 1) {
+            return res.status(403).json({ message: 'You do not have permission' });
+        }
         const { title, duration, albumId, artistId, genre, releaseDate, playCount } = req.body;
         const trackDTO = new TrackDTO(null, title, duration, albumId, artistId, genre, releaseDate, playCount);
         const result = await TrackDAO.createTrack(trackDTO);
@@ -37,6 +40,9 @@ const createTrack = async (req, res) => {
 
 const updateTrack = async (req, res) => {
     try {
+        if (req.user.role != 1) {
+            return res.status(403).json({ message: 'You do not have permission' });
+        }
         const { id } = req.params;
         const { title, duration, albumId, artistId, genre, releaseDate, playCount } = req.body;
         const trackDTO = new TrackDTO(id, title, duration, albumId, artistId, genre, releaseDate, playCount);
@@ -53,6 +59,9 @@ const updateTrack = async (req, res) => {
 
 const deleteTrack = async (req, res) => {
     try {
+        if (req.user.role != 1) {
+            return res.status(403).json({ message: 'You do not have permission' });
+        }
         const { id } = req.params;
         const result = await TrackDAO.deleteTrack(id);
         if (result.changes) {

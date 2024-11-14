@@ -26,6 +26,9 @@ const getAlbumById = async (req, res) => {
 
 const createAlbum = async (req, res) => {
     try {
+        if (req.user.role != 1) {
+            return res.status(403).json({ message: 'You do not have permission' });
+        }
         const { title, releaseDate, genre, artistId } = req.body;
         const albumDTO = new AlbumDTO(null, title, releaseDate, genre, artistId);
         const result = await albumDAO.createAlbum(albumDTO);
@@ -37,6 +40,9 @@ const createAlbum = async (req, res) => {
 
 const updateAlbum = async (req, res) => {
     try {
+        if (req.user.role != 1) {
+            return res.status(403).json({ message: 'You do not have permission' });
+        }
         const { id } = req.params;
         const { title, releaseDate, genre, artistId } = req.body;
         const albumDTO = new AlbumDTO(id, title, releaseDate, genre, artistId);
@@ -53,6 +59,9 @@ const updateAlbum = async (req, res) => {
 
 const deleteAlbum = async (req, res) => {
     try {
+        if (req.user.role != 1) {
+            return res.status(403).json({ message: 'You do not have permission' });
+        }
         const { id } = req.params;
         const result = await albumDAO.deleteAlbum(id);
         if (result.changes) {

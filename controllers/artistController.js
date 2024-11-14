@@ -26,6 +26,9 @@ const getArtistById = async (req, res) => {
 
 const createArtist = async (req, res) => {
     try {
+        if (req.user.role != 1) {
+            return res.status(403).json({ message: 'You do not have permission' });
+        }
         const { name, description, countryOfOrigin, playCount, isVerified } = req.body;
         const artistDTO = new ArtistDTO(null, name, description, countryOfOrigin, playCount, isVerified);
         const result = await artistDAO.createArtist(artistDTO);
@@ -37,6 +40,9 @@ const createArtist = async (req, res) => {
 
 const updateArtist = async (req, res) => {
     try {
+        if (req.user.role != 1) {
+            return res.status(403).json({ message: 'You do not have permission' });
+        }
         const { id } = req.params;
         const { name, description, countryOfOrigin, playCount, isVerified } = req.body;
         const artistDTO = new ArtistDTO(id, name, description, countryOfOrigin, playCount, isVerified);
@@ -53,6 +59,9 @@ const updateArtist = async (req, res) => {
 
 const deleteArtist = async (req, res) => {
     try {
+        if (req.user.role != 1) {
+            return res.status(403).json({ message: 'You do not have permission' });
+        }
         const { id } = req.params;
         const result = await artistDAO.deleteArtist(id);
         if (result.changes) {

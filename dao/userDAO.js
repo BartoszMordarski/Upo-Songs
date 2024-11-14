@@ -1,4 +1,5 @@
 const db = require('../db/database');
+const UserDTO = require("../models/userDTO");
 
 const getAllUsers = () => {
     return new Promise((resolve, reject) => {
@@ -19,6 +20,29 @@ const getUserById = (id) => {
                 reject(err);
             } else {
                 resolve(row);
+            }
+        });
+    });
+};
+
+//TODO zmienic to
+const getUserByUsername = (username) => {
+    return new Promise((resolve, reject) => {
+        db.get("SELECT * FROM Uzytkownicy WHERE nazwa_uzytkownika = ?", [username], (err, row) => {
+            if (err) {
+                reject(err);
+            } else if (row) {
+                const userDTO = new UserDTO(
+                    row.id_uzytkownika,
+                    row.nazwa_uzytkownika,
+                    row.haslo,
+                    row.email,
+                    row.rola,
+                    row.status_konta
+                );
+                resolve(userDTO);
+            } else {
+                resolve(null);
             }
         });
     });
@@ -76,4 +100,5 @@ module.exports = {
     createUser,
     updateUser,
     deleteUser,
+    getUserByUsername
 };
