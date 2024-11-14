@@ -7,6 +7,10 @@ class UserDTO {
         this.role = role;
         this.status = status;
     }
+
+    // get password() {
+    //     return this._password;
+    // }
 }
 
 module.exports = UserDTO;

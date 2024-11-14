@@ -3,7 +3,12 @@ const FavouriteListDTO = require('../models/favouriteListDTO');
 
 const getAllFavouritesByUserId = async (req, res) => {
     try {
+
         const { userId } = req.params;
+
+        if (req.user.role != 1 && req.user.id != userId) {
+            return res.status(403).json({ message: 'You do not have permission to see this users list' });
+        }
         const favourites = await favouriteListDAO.getAllFavouritesByUserId(userId);
         res.status(200).json(favourites);
     } catch (error) {
@@ -13,8 +18,16 @@ const getAllFavouritesByUserId = async (req, res) => {
 
 const addToFavourites = async (req, res) => {
     try {
-        const { userId, trackId, dateAdded } = req.body;
-        const favouriteListDTO = new FavouriteListDTO(null, userId, trackId, dateAdded);
+        const { trackId } = req.body;
+
+        const exists = await favouriteListDAO.checkIfFavouriteExists(req.user.id, trackId);
+        if (exists) {
+            return res.status(400).json({ message: 'Track already exists in your favourites' });
+        }
+
+        const dateAdded = new Date().toISOString().split('T')[0];
+        const favouriteListDTO = new FavouriteListDTO(null, req.user.id, trackId, dateAdded);
+
         const result = await favouriteListDAO.addToFavourites(favouriteListDTO);
         res.status(201).json({ message: 'Track added to favourites', id: result.id });
     } catch (error) {
@@ -22,14 +35,15 @@ const addToFavourites = async (req, res) => {
     }
 };
 
-const updateFavourite = async (req, res) => {
+const getFavouriteById = async (req, res) => {
     try {
         const { id } = req.params;
-        const { userId, trackId, dateAdded } = req.body;
-        const favouriteListDTO = new FavouriteListDTO(id, userId, trackId, dateAdded);
-        const result = await favouriteListDAO.updateFavourite(id, favouriteListDTO);
-        if (result.changes) {
-            res.status(200).json({ message: 'Favourite updated' });
+
+        const favouriteDTO = await favouriteListDAO.getFavouriteById(id);
+
+
+        if (favouriteDTO) {
+            res.status(200).json(favouriteDTO);
         } else {
             res.status(404).json({ message: 'Favourite not found' });
         }
@@ -41,7 +55,16 @@ const updateFavourite = async (req, res) => {
 const removeFavourite = async (req, res) => {
     try {
         const { id } = req.params;
+
+        const favouriteDTO = await favouriteListDAO.getFavouriteById(id);
+        const userId = favouriteDTO.userId;
+
+        if (req.user.role != 1 && req.user.id != userId) {
+            return res.status(403).json({ message: 'You do not have permission' });
+        }
+
         const result = await favouriteListDAO.removeFavourite(id);
+
         if (result.changes) {
             res.status(200).json({ message: 'Favourite removed' });
         } else {
@@ -55,6 +78,6 @@ const removeFavourite = async (req, res) => {
 module.exports = {
     getAllFavouritesByUserId,
     addToFavourites,
-    updateFavourite,
     removeFavourite,
+    getFavouriteById
 };
