@@ -12,6 +12,27 @@ const getAllArtists = () => {
     });
 };
 
+const getFilteredArtists = (filters) => {
+    return new Promise((resolve, reject) => {
+        let query = "SELECT * FROM Artysta WHERE 1=1";
+        const params = [];
+
+        if (filters.kraj_pochodzenia) {
+            query += " AND kraj_pochodzenia = ?";
+            params.push(filters.kraj_pochodzenia);
+        }
+
+        db.all(query, params, (err, rows) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(rows);
+            }
+        });
+    });
+};
+
+
 const getArtistById = (id) => {
     return new Promise((resolve, reject) => {
         db.get("SELECT * FROM Artysta WHERE id_artysty = ?", [id], (err, row) => {
@@ -76,4 +97,5 @@ module.exports = {
     createArtist,
     updateArtist,
     deleteArtist,
+    getFilteredArtists
 };

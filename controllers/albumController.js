@@ -3,10 +3,16 @@ const AlbumDTO = require('../models/AlbumDTO');
 
 const getAllAlbums = async (req, res) => {
     try {
-        const albums = await albumDAO.getAllAlbums();
-        res.status(200).json(albums);
+        const { data_wydania, gatunek, id_artysty } = req.query;
+        const filters = {};
+        if (data_wydania) filters.data_wydania = data_wydania;
+        if (gatunek) filters.gatunek = gatunek;
+        if (id_artysty) filters.id_artysty = id_artysty;
+
+        const albums = await albumDAO.getFilteredAlbums(filters);
+        res.json(albums);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: 'Failed to fetch albums.' });
     }
 };
 

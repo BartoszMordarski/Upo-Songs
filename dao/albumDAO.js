@@ -12,6 +12,34 @@ const getAllAlbums = () => {
     });
 };
 
+const getFilteredAlbums = (filters) => {
+    return new Promise((resolve, reject) => {
+        let query = "SELECT * FROM Album WHERE 1=1";
+        const params = [];
+
+        if (filters.data_wydania) {
+            query += " AND data_wydania = ?";
+            params.push(filters.data_wydania);
+        }
+        if (filters.gatunek) {
+            query += " AND gatunek = ?";
+            params.push(filters.gatunek);
+        }
+        if (filters.id_artysty) {
+            query += " AND id_artysty = ?";
+            params.push(filters.id_artysty);
+        }
+
+        db.all(query, params, (err, rows) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(rows);
+            }
+        });
+    });
+};
+
 const getAlbumById = (id) => {
     return new Promise((resolve, reject) => {
         db.get("SELECT * FROM Album WHERE id_albumu = ?", [id], (err, row) => {
@@ -76,4 +104,5 @@ module.exports = {
     createAlbum,
     updateAlbum,
     deleteAlbum,
+    getFilteredAlbums
 };
