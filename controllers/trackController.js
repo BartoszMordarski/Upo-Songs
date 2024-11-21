@@ -1,12 +1,19 @@
 const TrackDAO = require('../dao/TrackDAO');
 const TrackDTO = require('../models/TrackDTO');
 
+//TODO date mozna zmienic na sam rok
 const getAllTracks = async (req, res) => {
     try {
-        const tracksData = await TrackDAO.getAllTracks();
-        res.status(200).json(tracksData);
+        const { gatunek, data_wydania, id_artysty } = req.query;
+        const filters = {};
+        if (gatunek) filters.gatunek = gatunek;
+        if (data_wydania) filters.data_wydania = data_wydania;
+        if (id_artysty) filters.id_artysty = id_artysty;
+
+        const tracks = await TrackDAO.getFilteredTracks(filters);
+        res.json(tracks);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: 'Failed to fetch tracks.' });
     }
 };
 

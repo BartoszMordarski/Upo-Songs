@@ -3,10 +3,14 @@ const ArtistDTO = require('../models/ArtistDTO');
 
 const getAllArtists = async (req, res) => {
     try {
-        const artists = await artistDAO.getAllArtists();
-        res.status(200).json(artists);
+        const { kraj_pochodzenia } = req.query;
+        const filters = {};
+        if (kraj_pochodzenia) filters.kraj_pochodzenia = kraj_pochodzenia;
+
+        const artists = await artistDAO.getFilteredArtists(filters);
+        res.json(artists);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: 'Failed to fetch artists.' });
     }
 };
 

@@ -8,9 +8,6 @@ class UserDTO {
         this.status = status;
     }
 
-    // get password() {
-    //     return this._password;
-    // }
 }
 
 module.exports = UserDTO;
